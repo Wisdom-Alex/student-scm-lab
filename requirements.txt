@@ -1,0 +1,1 @@
+# Baseline v1.0 has no third-party dependencies.
