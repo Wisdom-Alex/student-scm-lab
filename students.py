@@ -1,23 +1,50 @@
-"""Data module: holds the student records used by the demo application."""
+"""Data module.
 
-students = [
-    {"name": "James", "score": 45},
-    {"name": "Deborah", "score": 82},
+Holds the Student model (validated with Pydantic) and the in-memory
+student list. Statistics and formatting live in ``utils`` so that this
+module has a single responsibility: the data.
+"""
+
+from pydantic import BaseModel, Field, field_validator
+
+
+class Student(BaseModel):
+    """A single student record, validated when it is created."""
+
+    name: str = Field(min_length=1)
+    score: float = Field(ge=0, le=100)
+
+    @field_validator("name")
+    @classmethod
+    def strip_name(cls, value: str) -> str:
+        """Remove surrounding whitespace and reject blank names."""
+        value = value.strip()
+        if not value:
+            raise ValueError("name must not be blank")
+        return value
+
+
+students: list[Student] = [
+    Student(name="James", score=45),
+    Student(name="Deborah", score=82),
 ]
 
 
-def average_score(data):
-    if len(data) == 0:
-        return 0  # Preventive maintenance: avoid division by zero
-    total = 0
-    for d in data:
-        total += d["score"]
-    return total / len(data)
+def add_student(name: str, score: float, data: list[Student] | None = None) -> Student:
+    """Validate a new student and append it to ``data``.
 
+    Args:
+        name: Student name (whitespace is stripped).
+        score: Score between 0 and 100 inclusive.
+        data: Target list. Defaults to the module level ``students`` list.
 
-def add_student(name, score):
-    students.append({"name": name, "score": score})
+    Returns:
+        The validated Student that was added.
 
-
-print("Current Students:", students)
-print("Average Score:", average_score(students))
+    Raises:
+        pydantic.ValidationError: If the name or score is invalid.
+    """
+    target = students if data is None else data
+    student = Student(name=name, score=score)
+    target.append(student)
+    return student
