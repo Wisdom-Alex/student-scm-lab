@@ -2,18 +2,17 @@
 
 from pydantic import ValidationError
 
-from students import students, add_student, average_score
+from students import students, add_student, format_report
 from utils.helpers import highest_score, lowest_score
 
 
 def main() -> None:
-    print("Current Students:", students)
     add_student("Amina", 67)
     add_student("Chukwu", 91)
+    print(format_report(students))
+    print()
     print("Highest:", highest_score(students))
     print("Lowest:", lowest_score(students))
-    print("Average:", average_score(students))
-    print("Empty average:", average_score([]))
 
     try:
         add_student("Bad Data", 250)
