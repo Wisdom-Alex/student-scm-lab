@@ -2,11 +2,13 @@
 
 from pydantic import ValidationError
 
-from students import students, add_student, format_report
+from students import students, add_student
 from utils.helpers import highest_score, lowest_score
+from utils.report import format_report
 
 
 def main() -> None:
+    """Run the demo: add students, print the report, test validation."""
     add_student("Amina", 67)
     add_student("Chukwu", 91)
     print(format_report(students))

@@ -1,12 +1,15 @@
-"""Data module: Pydantic-validated student records (Python 3.12+)."""
+"""Data module.
 
-from statistics import median
+Holds the Student model (validated with Pydantic) and the in-memory
+student list. Statistics and formatting live in ``utils`` so that this
+module has a single responsibility: the data.
+"""
 
 from pydantic import BaseModel, Field, field_validator
 
 
 class Student(BaseModel):
-    """A single student record validated on creation."""
+    """A single student record, validated when it is created."""
 
     name: str = Field(min_length=1)
     score: float = Field(ge=0, le=100)
@@ -14,6 +17,7 @@ class Student(BaseModel):
     @field_validator("name")
     @classmethod
     def strip_name(cls, value: str) -> str:
+        """Remove surrounding whitespace and reject blank names."""
         value = value.strip()
         if not value:
             raise ValueError("name must not be blank")
@@ -26,39 +30,21 @@ students: list[Student] = [
 ]
 
 
-def average_score(data: list[Student]) -> float:
-    """Return the mean score, or 0.0 when the list is empty."""
-    if not data:
-        return 0.0
-    return sum(s.score for s in data) / len(data)
+def add_student(name: str, score: float, data: list[Student] | None = None) -> Student:
+    """Validate a new student and append it to ``data``.
 
+    Args:
+        name: Student name (whitespace is stripped).
+        score: Score between 0 and 100 inclusive.
+        data: Target list. Defaults to the module level ``students`` list.
 
-def median_score(data: list[Student]) -> float:
-    """Return the median score, or 0.0 when the list is empty."""
-    return median(s.score for s in data) if data else 0.0
+    Returns:
+        The validated Student that was added.
 
-
-def letter_grade(score: float) -> str:
-    """Map a numeric score to a letter grade."""
-    for cut_off, grade in ((70, "A"), (60, "B"), (50, "C"), (45, "D")):
-        if score >= cut_off:
-            return grade
-    return "F"
-
-
-def add_student(name: str, score: float) -> Student:
-    """Validate and append a student. Raises pydantic.ValidationError."""
+    Raises:
+        pydantic.ValidationError: If the name or score is invalid.
+    """
+    target = students if data is None else data
     student = Student(name=name, score=score)
-    students.append(student)
+    target.append(student)
     return student
-
-
-def format_report(data: list[Student]) -> str:
-    """Return a console-friendly table with summary statistics."""
-    lines = [f"{'Name':<12}{'Score':>7}  Grade"]
-    for s in sorted(data, key=lambda x: x.score, reverse=True):
-        lines.append(f"{s.name:<12}{s.score:>7.1f}  {letter_grade(s.score)}")
-    lines.append("")
-    lines.append(f"{'Average':<12}{average_score(data):>7.2f}")
-    lines.append(f"{'Median':<12}{median_score(data):>7.2f}")
-    return "\n".join(lines)
