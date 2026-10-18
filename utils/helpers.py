@@ -1,5 +1,6 @@
 """Helper module: statistics and grading for student records."""
 
+from typing import Optional
 from statistics import median
 
 from students import Student
@@ -8,12 +9,12 @@ from students import Student
 GRADE_BANDS: tuple[tuple[int, str], ...] = ((70, "A"), (60, "B"), (50, "C"), (45, "D"))
 
 
-def highest_score(data: list[Student]) -> Student | None:
+def highest_score(data: list[Student]) -> Optional[Student]:
     """Return the student with the highest score, or None if no data."""
     return max(data, key=lambda s: s.score, default=None)
 
 
-def lowest_score(data: list[Student]) -> Student | None:
+def lowest_score(data: list[Student]) -> Optional[Student]:
     """Return the student with the lowest score, or None if no data."""
     return min(data, key=lambda s: s.score, default=None)
 

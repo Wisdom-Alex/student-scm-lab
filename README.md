@@ -1,7 +1,7 @@
 # Student Score Manager
 
 A small modular Python project used for SEN 401 (Software Configuration Management and Maintenance).
-Requires **Python 3.12+**.
+Requires **Python 3.9 or newer** (tested on 3.9 and 3.12).
 
 ## Project structure
 
