@@ -5,6 +5,7 @@ student list. Statistics and formatting live in ``utils`` so that this
 module has a single responsibility: the data.
 """
 
+from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -30,7 +31,7 @@ students: list[Student] = [
 ]
 
 
-def add_student(name: str, score: float, data: list[Student] | None = None) -> Student:
+def add_student(name: str, score: float, data: Optional[list[Student]] = None) -> Student:
     """Validate a new student and append it to ``data``.
 
     Args:
